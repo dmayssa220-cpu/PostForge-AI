@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postforge-db
+    environment:
+      POSTGRES_DB: postforge
+      POSTGRES_USER: postforge
+      POSTGRES_PASSWORD: postforge
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postforge"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ai-service:
+    build: ./ai-service
+    container_name: postforge-ai-service
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    ports:
+      - "8000:8000"
+
+  backend:
+    build: ./backend
+    container_name: postforge-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    environment:
+      DB_USERNAME: postforge
+      DB_PASSWORD: postforge
+      AI_SERVICE_URL: http://ai-service:8000
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend/postforge-frontend
+    container_name: postforge-frontend
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
+
+volumes:
+  postgres_data:
