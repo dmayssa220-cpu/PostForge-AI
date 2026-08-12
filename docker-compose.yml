@@ -16,13 +16,13 @@ services:
       timeout: 5s
       retries: 5
 
-  ai-service:
-    build: ./ai-service
-    container_name: postforge-ai-service
-    environment:
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-    ports:
-      - "8000:8000"
+  #ai-service:
+    #build: ./ai-service
+    #container_name: postforge-ai-service
+    #environment:
+      #ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    #ports:
+      #- "8000:8000"
 
   backend:
     build: ./backend
@@ -30,14 +30,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      ai-service:
-        condition: service_started
+      #ai-service:
+        #condition: service_started
     environment:
       DB_HOST: postgres
       DB_USERNAME: postforge
       DB_PASSWORD: postforge
       AI_SERVICE_URL: http://ai-service:8000
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
     ports:
       - "8080:8080"
 

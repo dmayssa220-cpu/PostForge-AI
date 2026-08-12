@@ -37,4 +37,13 @@ public class User {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+    @Column(name = "email_verified", nullable = false)
+    @Builder.Default
+    private boolean emailVerified = false;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+
+    @Column(name = "verification_token_expiry")
+    private LocalDateTime verificationTokenExpiry;
 }
