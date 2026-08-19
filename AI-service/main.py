@@ -1,7 +1,7 @@
 import json
 import os
 
-from anthropic import Anthropic
+from google import genai
 from fastapi import FastAPI, HTTPException
 from pydantic import ValidationError
 
@@ -9,7 +9,7 @@ from models import GenerationRequest, CarouselResponse
 
 app = FastAPI(title="PostForge AI - Microservice IA")
 
-client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 CAROUSEL_SYSTEM_PROMPT = """Tu es un générateur de contenu structuré pour LinkedIn.
 Tu dois répondre UNIQUEMENT avec un JSON valide, sans aucun texte avant ou après,
@@ -40,13 +40,18 @@ def generate_carousel(request: GenerationRequest):
         tone=request.tone, language=request.language, topic=request.topic
     )
 
-    message = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=2000,
-        messages=[{"role": "user", "content": prompt}],
-    )
+    response = client.models.generate_content(
+    model="gemini-3.6-flash",
+    contents=prompt,
+)
 
-    raw_text = message.content[0].text
+    raw_text = response.text.strip()
+
+    # Gemini peut parfois entourer le JSON de ```json ... ``` malgré la consigne
+    if raw_text.startswith("```"):
+        raw_text = raw_text.strip("`")
+        if raw_text.startswith("json"):
+            raw_text = raw_text[4:].strip()
 
     try:
         data = json.loads(raw_text)

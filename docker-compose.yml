@@ -14,15 +14,16 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postforge"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
 
-  # ai-service:
-  #   build: ./ai-service
-  #   container_name: postforge-ai-service
-  #   environment:
-  #     ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-  #   ports:
-  #     - "8000:8000"
+  ai-service:
+    build: ./ai-service
+    container_name: postforge-ai-service
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    ports:
+      - "8000:8000"
 
   backend:
     build: ./backend
@@ -30,8 +31,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      # ai-service:
-      #   condition: service_started
+      ai-service:
+        condition: service_started
     environment:
       DB_HOST: postgres
       DB_USERNAME: postforge
