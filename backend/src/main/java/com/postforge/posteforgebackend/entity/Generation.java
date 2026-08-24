@@ -41,7 +41,6 @@ public class Generation {
     @Column(nullable = false, length = 50)
     private String tone;
 
-    // NOTE: nécessite la dépendance hypersistence-utils pour mapper JSONB proprement.
     @Type(JsonType.class)
     @Column(name = "raw_output", columnDefinition = "jsonb")
     private Map<String, Object> rawOutput;
