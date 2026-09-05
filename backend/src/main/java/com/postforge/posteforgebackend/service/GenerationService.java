@@ -1,6 +1,5 @@
 package com.postforge.posteforgebackend.service;
 
-//import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postforge.posteforgebackend.dto.CarouselResponse;
 import com.postforge.posteforgebackend.dto.GenerationRequest;
 import com.postforge.posteforgebackend.entity.Generation;
@@ -8,6 +7,8 @@ import com.postforge.posteforgebackend.entity.User;
 import com.postforge.posteforgebackend.repository.GenerationRepository;
 import com.postforge.posteforgebackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -15,8 +16,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GenerationService {
@@ -37,9 +38,13 @@ public class GenerationService {
                 "tone", request.tone() != null ? request.tone() : "expert"
         );
 
+        String jsonBody = objectMapper.writeValueAsString(aiPayload);
+        log.info("Payload envoyé à ai-service: {}", jsonBody);
+
         CarouselResponse aiResponse = aiServiceRestClient.post()
                 .uri("/internal/v1/generate/carousel")
-                .body(aiPayload)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(jsonBody)
                 .retrieve()
                 .body(CarouselResponse.class);
 

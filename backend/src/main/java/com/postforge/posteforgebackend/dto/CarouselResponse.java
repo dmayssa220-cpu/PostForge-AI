@@ -11,5 +11,6 @@ public record CarouselResponse(
         String ctaSlide,
         List<String> suggestedHashtags
 ) {
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public record Slide(int slideNumber, String title, String content) {}
 }
