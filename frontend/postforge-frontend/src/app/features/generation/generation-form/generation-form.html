@@ -1,1 +1,77 @@
-<p>generation-form works!</p>
+<div class="page-container">
+  <header class="page-header">
+    <h1>PostForge AI</h1>
+    <button class="link-button" (click)="goToHistory()">Voir l'historique</button>
+  </header>
+
+  <div class="form-card">
+    <h2>Générer un carrousel LinkedIn</h2>
+
+    <form (ngSubmit)="onSubmit()" #genForm="ngForm">
+      <div class="form-group">
+        <label for="topic">Sujet</label>
+        <input
+          type="text"
+          id="topic"
+          name="topic"
+          [(ngModel)]="topic"
+          required
+          placeholder="Ex: Le pattern Singleton"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="language">Langue</label>
+          <select id="language" name="language" [(ngModel)]="language">
+            <option value="fr">Français</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="tone">Ton</label>
+          <select id="tone" name="tone" [(ngModel)]="tone">
+            <option value="expert">Expert</option>
+            <option value="debutant">Débutant</option>
+          </select>
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <p class="error">{{ errorMessage() }}</p>
+      }
+
+      <button type="submit" [disabled]="genForm.invalid || isLoading()">
+        {{ isLoading() ? 'Génération en cours...' : 'Générer' }}
+      </button>
+    </form>
+  </div>
+
+  @if (result(); as res) {
+    <div class="result-card">
+      <h2>{{ res.topic }}</h2>
+
+      <div class="slides-list">
+        @for (slide of res.rawOutput.slides; track slide.slide_number) {
+          <div class="slide">
+            <span class="slide-number">Slide {{ slide.slide_number }}</span>
+            <h3>{{ slide.title }}</h3>
+            <p>{{ slide.content }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="cta-block">
+        <strong>Call to action :</strong>
+        <p>{{ res.rawOutput.cta_slide }}</p>
+      </div>
+
+      <div class="hashtags">
+        @for (tag of res.rawOutput.suggested_hashtags; track tag) {
+          <span class="hashtag">{{ tag }}</span>
+        }
+      </div>
+    </div>
+  }
+</div>

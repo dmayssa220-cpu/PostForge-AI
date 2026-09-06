@@ -5,15 +5,15 @@ export interface GenerationRequest {
 }
 
 export interface Slide {
-  slideNumber: number;
+  slide_number: number;
   title: string;
   content: string;
 }
 
 export interface CarouselOutput {
   slides: Slide[];
-  ctaSlide: string;
-  suggestedHashtags: string[];
+  cta_slide: string;
+  suggested_hashtags: string[];
 }
 
 export interface GenerationResponse {
