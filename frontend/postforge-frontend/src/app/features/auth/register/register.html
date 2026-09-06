@@ -1,1 +1,61 @@
-<p>register works!</p>
+<div class="auth-container">
+  <div class="auth-card">
+    <h1>Créer un compte</h1>
+
+    @if (successMessage()) {
+      <p class="success">{{ successMessage() }}</p>
+      <p class="switch-link">
+        <a routerLink="/login">Aller à la connexion</a>
+      </p>
+    } @else {
+      <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+        <div class="form-group">
+          <label for="fullName">Nom complet</label>
+          <input
+            type="text"
+            id="fullName"
+            name="fullName"
+            [(ngModel)]="fullName"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="email"
+            required
+            email
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [(ngModel)]="password"
+            required
+            minlength="8"
+          />
+        </div>
+
+        @if (errorMessage()) {
+          <p class="error">{{ errorMessage() }}</p>
+        }
+
+        <button type="submit" [disabled]="registerForm.invalid || isLoading()">
+          {{ isLoading() ? 'Création...' : 'Créer mon compte' }}
+        </button>
+      </form>
+
+      <p class="switch-link">
+        Déjà un compte ? <a routerLink="/login">Se connecter</a>
+      </p>
+    }
+  </div>
+</div>

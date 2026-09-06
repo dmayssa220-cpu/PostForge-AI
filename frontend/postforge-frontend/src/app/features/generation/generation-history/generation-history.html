@@ -1,1 +1,41 @@
-<p>generation-history works!</p>
+<div class="page-container">
+  <header class="page-header">
+    <h1>Historique</h1>
+    <button class="link-button" (click)="goToGenerate()">+ Nouvelle génération</button>
+  </header>
+
+  @if (isLoading()) {
+    <p>Chargement...</p>
+  } @else if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  } @else if (generations().length === 0) {
+    <p class="empty-state">Aucune génération pour l'instant.</p>
+  } @else {
+    <div class="history-list">
+      @for (gen of generations(); track gen.id) {
+        <div class="history-item">
+          <div class="history-header">
+            <h3>{{ gen.topic }}</h3>
+            <span class="date">{{ gen.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <p class="meta">{{ gen.language === 'fr' ? 'Français' : 'English' }} · {{ gen.tone }}</p>
+
+          <div class="slides-preview">
+            @for (slide of gen.rawOutput.slides; track slide.slide_number) {
+              <div class="slide-mini">
+                <strong>{{ slide.slide_number }}. {{ slide.title }}</strong>
+                <p>{{ slide.content }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="hashtags">
+            @for (tag of gen.rawOutput.suggested_hashtags; track tag) {
+              <span class="hashtag">{{ tag }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
