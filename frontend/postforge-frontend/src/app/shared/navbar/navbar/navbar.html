@@ -1,0 +1,11 @@
+@if (isAuthenticated) {
+  <nav class="navbar">
+    <span class="brand" routerLink="/generate">PostForge AI</span>
+    <div class="nav-links">
+      <a routerLink="/generate">Générer</a>
+      <a routerLink="/history">Historique</a>
+      <span class="user-name">{{ userFullName }}</span>
+      <button (click)="logout()">Déconnexion</button>
+    </div>
+  </nav>
+}
