@@ -1,6 +1,6 @@
 # PostForge AI
 
-Plateforme de génération automatique de contenu LinkedIn technique via IA.
+Plateforme de génération automatique de contenu via IA.
 
 ## Structure du monorepo
 - `frontend/` — Angular
