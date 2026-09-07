@@ -1,11 +1,18 @@
 @if (isAuthenticated) {
   <nav class="navbar">
-    <span class="brand" routerLink="/generate">PostForge AI</span>
-    <div class="nav-links">
-      <a routerLink="/generate">Générer</a>
-      <a routerLink="/history">Historique</a>
-      <span class="user-name">{{ userFullName }}</span>
-      <button (click)="logout()">Déconnexion</button>
+    <div class="navbar-inner">
+      <span class="brand" routerLink="/generate">
+        <span class="brand-icon">✦</span> PostForge AI
+      </span>
+      <div class="nav-links">
+        <a routerLink="/generate" routerLinkActive="active">Générer</a>
+        <a routerLink="/history" routerLinkActive="active">Historique</a>
+        <div class="user-chip">
+          <span class="avatar">{{ userFullName?.charAt(0) }}</span>
+          <span class="user-name">{{ userFullName }}</span>
+        </div>
+        <button class="logout-btn" (click)="logout()">Déconnexion</button>
+      </div>
     </div>
   </nav>
 }

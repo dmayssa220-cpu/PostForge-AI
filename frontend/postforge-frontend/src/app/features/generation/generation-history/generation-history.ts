@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { GenerationService } from '../../../core/services/generation.service';
 import { GenerationResponse } from '../../../core/models/generation.model';
+import { CarouselViewer } from '../../../shared/carousel-viewer/carousel-viewer';
 
 @Component({
   selector: 'app-generation-history',
-  imports: [CommonModule],
+  imports: [CommonModule, CarouselViewer],
   templateUrl: './generation-history.html',
   styleUrl: './generation-history.scss'
 })

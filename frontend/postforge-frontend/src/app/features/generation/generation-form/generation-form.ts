@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GenerationService } from '../../../core/services/generation.service';
 import { GenerationResponse } from '../../../core/models/generation.model';
+import { CarouselViewer } from '../../../shared/carousel-viewer/carousel-viewer';
 
 @Component({
   selector: 'app-generation-form',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CarouselViewer],
   templateUrl: './generation-form.html',
   styleUrl: './generation-form.scss'
 })

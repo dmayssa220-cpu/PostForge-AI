@@ -1,0 +1,129 @@
+.carousel-viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.slide-frame {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+.slide-content {
+  padding: 2.2rem;
+  color: white;
+  text-align: left;
+  width: 100%;
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin: 0.8rem 0 1rem;
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.5;
+    white-space: pre-line;
+    opacity: 0.95;
+  }
+}
+
+.cta-content {
+  text-align: center;
+
+  .cta-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+  }
+}
+
+.slide-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+
+  span {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.3rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+  }
+}
+
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  &.left { left: 12px; }
+  &.right { right: 12px; }
+}
+
+.dots {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: var(--border);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+
+  &.active {
+    background: var(--primary);
+    width: 20px;
+    border-radius: 4px;
+  }
+}
