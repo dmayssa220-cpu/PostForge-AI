@@ -12,6 +12,9 @@ public record GenerationResponse(
         String contentType,
         String language,
         String tone,
+        String status,
+        LocalDateTime scheduledDate,
+        LocalDateTime publishedDate,
         Map<String, Object> rawOutput,
         Map<String, Object> editedOutput,
         LocalDateTime createdAt
@@ -23,6 +26,9 @@ public record GenerationResponse(
                 generation.getContentType().name(),
                 generation.getLanguage(),
                 generation.getTone(),
+                generation.getStatus().name(),
+                generation.getScheduledDate(),
+                generation.getPublishedDate(),
                 generation.getRawOutput(),
                 generation.getEditedOutput(),
                 generation.getCreatedAt()

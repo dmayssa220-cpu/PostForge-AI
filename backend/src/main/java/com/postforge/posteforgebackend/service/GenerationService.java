@@ -2,6 +2,7 @@ package com.postforge.posteforgebackend.service;
 
 import com.postforge.posteforgebackend.dto.CarouselResponse;
 import com.postforge.posteforgebackend.dto.GenerationRequest;
+import com.postforge.posteforgebackend.dto.ScheduleRequest;
 import com.postforge.posteforgebackend.entity.Generation;
 import com.postforge.posteforgebackend.entity.User;
 import com.postforge.posteforgebackend.repository.GenerationRepository;
@@ -14,8 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -68,5 +71,35 @@ public class GenerationService {
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
         return generationRepository.findByUserOrderByCreatedAtDesc(user);
+    }
+    public Generation scheduleGeneration(UUID id, ScheduleRequest request) {
+        Generation generation = getOwnedGeneration(id);
+        generation.setScheduledDate(request.scheduledDate());
+        generation.setStatus(Generation.Status.scheduled);
+        return generationRepository.save(generation);
+    }
+
+    public Generation markAsPublished(UUID id) {
+        Generation generation = getOwnedGeneration(id);
+        generation.setStatus(Generation.Status.published);
+        generation.setPublishedDate(java.time.LocalDateTime.now());
+        return generationRepository.save(generation);
+    }
+
+    public List<Generation> getCalendar(LocalDateTime start, LocalDateTime end) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+        return generationRepository.findByUserAndScheduledDateBetweenOrderByScheduledDateAsc(user, start, end);
+    }
+
+    private Generation getOwnedGeneration(UUID id) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Generation generation = generationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Génération introuvable"));
+        if (!generation.getUser().getEmail().equals(email)) {
+            throw new RuntimeException("Accès refusé.");
+        }
+        return generation;
     }
 }

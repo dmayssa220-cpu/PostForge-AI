@@ -63,4 +63,19 @@ public class Generation {
     public enum ContentType {
         carousel, post, poll
     }
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "status", nullable = false)
+    @Builder.Default
+    private Status status = Status.draft;
+
+    @Column(name = "scheduled_date")
+    private LocalDateTime scheduledDate;
+
+    @Column(name = "published_date")
+    private LocalDateTime publishedDate;
+
+    public enum Status {
+        draft, scheduled, published
+    }
 }
