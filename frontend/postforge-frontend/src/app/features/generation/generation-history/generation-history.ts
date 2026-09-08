@@ -34,4 +34,29 @@ export class GenerationHistory implements OnInit {
   goToGenerate(): void {
     this.router.navigate(['/generate']);
   }
+  
+  schedule(gen: GenerationResponse, dateInput: HTMLInputElement): void {
+  const value = dateInput.value; // format: "2026-09-15T10:00"
+  if (!value) return;
+
+  const scheduledDate = value.length === 16 ? `${value}:00` : value; // ajoute les secondes si absentes
+
+  this.generationService.schedule(gen.id, { scheduledDate }).subscribe({
+    next: () => this.ngOnInit(),
+    error: (err) => {
+      console.error(err);
+      alert('Erreur lors de la planification : ' + (err.error?.error || err.message));
+    }
+  });
+}
+
+publish(gen: GenerationResponse): void {
+  this.generationService.publish(gen.id).subscribe({
+    next: () => this.ngOnInit(),
+    error: (err) => {
+      console.error(err);
+      alert('Erreur lors de la publication : ' + (err.error?.error || err.message));
+    }
+  });
+}
 }

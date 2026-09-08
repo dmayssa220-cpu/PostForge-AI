@@ -95,3 +95,40 @@
     margin: 0;
   }
 }
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.status-badge {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  text-transform: capitalize;
+
+  &.draft { background: #f3f4f6; color: #6b7280; }
+  &.scheduled { background: var(--primary-light); color: var(--primary-dark); }
+  &.published { background: #dcfce7; color: #16a34a; }
+}
+
+.action-btn {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+}
+.date-input {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.78rem;
+}

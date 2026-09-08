@@ -1,0 +1,68 @@
+<div class="page-container">
+  <header class="page-header">
+    <div>
+      <h1>Calendrier éditorial</h1>
+      <p class="subtitle">Planifie et suis tes publications LinkedIn</p>
+    </div>
+    <div class="header-actions">
+      <button class="link-button" (click)="goToHistory()">📜 Historique</button>
+      <button class="link-button" (click)="goToGenerate()">✨ Nouvelle génération</button>
+    </div>
+  </header>
+
+  <div class="calendar-nav">
+    <button (click)="prevMonth()">‹</button>
+    <h2>{{ monthLabel() }}</h2>
+    <button (click)="nextMonth()">›</button>
+  </div>
+
+  @if (isLoading()) {
+    <p class="loading">Chargement...</p>
+  } @else {
+    <div class="calendar-grid">
+      @for (label of ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']; track label) {
+        <div class="weekday">{{ label }}</div>
+      }
+
+      @for (day of calendarDays(); track day.date.getTime()) {
+        <div
+          class="day-cell"
+          [class.other-month]="!day.isCurrentMonth"
+          [class.today]="day.isToday"
+          [class.has-content]="day.generations.length > 0"
+          (click)="selectDay(day)"
+        >
+          <span class="day-number">{{ day.date.getDate() }}</span>
+          @for (gen of day.generations.slice(0, 2); track gen.id) {
+            <div class="day-chip" [class.published]="gen.status === 'published'">
+              {{ gen.topic }}
+            </div>
+          }
+          @if (day.generations.length > 2) {
+            <span class="more-chip">+{{ day.generations.length - 2 }}</span>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  @if (selectedDay(); as day) {
+    <div class="detail-overlay" (click)="closeDetail()">
+      <div class="detail-panel" (click)="$event.stopPropagation()">
+        <div class="detail-header">
+          <h3>{{ day.date | date: 'dd MMMM yyyy' }}</h3>
+          <button class="close-btn" (click)="closeDetail()">✕</button>
+        </div>
+        @for (gen of day.generations; track gen.id) {
+          <div class="detail-item">
+            <div class="detail-item-header">
+              <strong>{{ gen.topic }}</strong>
+              <span class="status-badge" [class]="gen.status">{{ gen.status }}</span>
+            </div>
+            <p class="detail-time">{{ gen.scheduledDate | date: 'HH:mm' }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
