@@ -1,6 +1,7 @@
 package com.postforge.posteforgebackend.service;
 
 import com.postforge.posteforgebackend.dto.CarouselResponse;
+import com.postforge.posteforgebackend.dto.EditGenerationRequest;
 import com.postforge.posteforgebackend.dto.GenerationRequest;
 import com.postforge.posteforgebackend.dto.ScheduleRequest;
 import com.postforge.posteforgebackend.entity.Generation;
@@ -101,5 +102,24 @@ public class GenerationService {
             throw new RuntimeException("Accès refusé.");
         }
         return generation;
+    }
+    public void deleteGeneration(UUID id) {
+        Generation generation = getOwnedGeneration(id);
+        generationRepository.delete(generation);
+    }
+    public Generation updateEditedOutput(UUID id, EditGenerationRequest request) {
+        Generation generation = getOwnedGeneration(id);
+        generation.setEditedOutput(request.editedOutput());
+        return generationRepository.save(generation);
+    }
+    public List<Generation> searchGenerations(String topic, String status) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
+        Generation.Status statusEnum = (status != null && !status.isBlank())
+                ? Generation.Status.valueOf(status) : null;
+
+        return generationRepository.searchByUser(user, (topic != null && !topic.isBlank()) ? topic : null, statusEnum);
     }
 }

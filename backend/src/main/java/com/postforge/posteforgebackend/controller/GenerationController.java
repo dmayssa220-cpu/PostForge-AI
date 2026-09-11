@@ -1,18 +1,21 @@
 package com.postforge.posteforgebackend.controller;
 
+import com.postforge.posteforgebackend.dto.EditGenerationRequest;
 import com.postforge.posteforgebackend.dto.GenerationRequest;
 import com.postforge.posteforgebackend.dto.GenerationResponse;
 import com.postforge.posteforgebackend.dto.ScheduleRequest;
 import com.postforge.posteforgebackend.service.GenerationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/generations")
 @RequiredArgsConstructor
@@ -55,4 +58,26 @@ public class GenerationController {
                         .toList()
         );
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        generationService.deleteGeneration(id);
+        return ResponseEntity.noContent().build();
+    }
+    @PutMapping("/{id}/edit")
+    public ResponseEntity<GenerationResponse> edit(
+            @PathVariable UUID id, @RequestBody EditGenerationRequest request) {
+        return ResponseEntity.ok(GenerationResponse.from(generationService.updateEditedOutput(id, request)));
+    }
+    @GetMapping("/search")
+ public ResponseEntity<List<GenerationResponse>> search(
+        @RequestParam(required = false) String topic,
+        @RequestParam(required = false) String status) {
+    log.info("=== SEARCH appelé — topic: {}, status: {}", topic, status);
+    log.info("Authentification : {}", SecurityContextHolder.getContext().getAuthentication());
+    return ResponseEntity.ok(
+            generationService.searchGenerations(topic, status).stream()
+                    .map(GenerationResponse::from)
+                    .toList()
+    );
+}
 }

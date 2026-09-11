@@ -30,7 +30,32 @@
     }
     <button class="dot" [class.active]="isCtaSlide" (click)="goTo(slides.length)"></button>
   </div>
+@if (editable && !isEditing()) {
+  <button class="export-btn" (click)="startEditing()">✏️ Éditer le contenu</button>
+}
 
+@if (isEditing()) {
+  <div class="edit-panel">
+    <h4>Édition des slides</h4>
+    @for (slide of editableSlides; track $index; let i = $index) {
+      <div class="edit-slide">
+        <label>Slide {{ i + 1 }} — Titre</label>
+        <input type="text" [(ngModel)]="slide.title" />
+        <label>Contenu</label>
+        <textarea [(ngModel)]="slide.content" rows="3"></textarea>
+      </div>
+    }
+    <label>Call to action</label>
+    <textarea [(ngModel)]="editableCta" rows="2"></textarea>
+
+    <div class="edit-actions">
+      <button class="export-btn" (click)="cancelEditing()">Annuler</button>
+      <button class="export-btn primary" (click)="saveEditing()" [disabled]="isSaving()">
+        {{ isSaving() ? 'Sauvegarde...' : '💾 Sauvegarder' }}
+      </button>
+    </div>
+  </div>
+}
   <div class="export-actions">
     <button class="export-btn" (click)="exportAsPNG()" [disabled]="isExporting()">
       🖼️ Exporter cette slide (PNG)

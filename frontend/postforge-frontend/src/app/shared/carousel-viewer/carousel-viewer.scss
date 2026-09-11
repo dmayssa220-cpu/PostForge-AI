@@ -176,3 +176,43 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+.edit-panel {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-top: 0.5rem;
+
+  h4 {
+    margin: 0 0 1rem;
+  }
+}
+
+.edit-slide {
+  margin-bottom: 1rem;
+
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin: 0.4rem 0 0.2rem;
+    color: var(--text-muted);
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-family: inherit;
+  }
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}

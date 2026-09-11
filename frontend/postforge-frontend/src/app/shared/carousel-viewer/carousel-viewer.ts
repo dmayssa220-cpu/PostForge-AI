@@ -1,12 +1,14 @@
-import { Component, Input, signal, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Slide } from '../../core/models/generation.model';
+import { GenerationService } from '../../core/services/generation.service';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-carousel-viewer',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './carousel-viewer.html',
   styleUrl: './carousel-viewer.scss'
 })
@@ -15,11 +17,18 @@ export class CarouselViewer {
   @Input() ctaSlide = '';
   @Input() hashtags: string[] = [];
   @Input() topic = '';
+  @Input() generationId = '';
+  @Input() editable = false;
 
   @ViewChild('slideFrame') slideFrame!: ElementRef<HTMLDivElement>;
 
   currentIndex = signal(0);
   isExporting = signal(false);
+  isEditing = signal(false);
+  isSaving = signal(false);
+
+  editableSlides: Slide[] = [];
+  editableCta = '';
 
   private gradients = [
     'linear-gradient(135deg, #6366f1, #a855f7)',
@@ -30,6 +39,8 @@ export class CarouselViewer {
     'linear-gradient(135deg, #8b5cf6, #6366f1)',
     'linear-gradient(135deg, #1e293b, #475569)',
   ];
+
+  constructor(private generationService: GenerationService) {}
 
   get totalSlides(): number {
     return this.slides.length + 1;
@@ -48,25 +59,54 @@ export class CarouselViewer {
   }
 
   next(): void {
-    if (this.currentIndex() < this.totalSlides - 1) {
-      this.currentIndex.update(i => i + 1);
-    }
+    if (this.currentIndex() < this.totalSlides - 1) this.currentIndex.update(i => i + 1);
   }
 
   prev(): void {
-    if (this.currentIndex() > 0) {
-      this.currentIndex.update(i => i - 1);
-    }
+    if (this.currentIndex() > 0) this.currentIndex.update(i => i - 1);
   }
 
   goTo(index: number): void {
     this.currentIndex.set(index);
   }
 
+  startEditing(): void {
+    this.editableSlides = JSON.parse(JSON.stringify(this.slides));
+    this.editableCta = this.ctaSlide;
+    this.isEditing.set(true);
+  }
+
+  cancelEditing(): void {
+    this.isEditing.set(false);
+  }
+
+  saveEditing(): void {
+    if (!this.generationId) return;
+    this.isSaving.set(true);
+
+    const editedOutput = {
+      slides: this.editableSlides,
+      cta_slide: this.editableCta,
+      suggested_hashtags: this.hashtags
+    };
+
+    this.generationService.editGeneration(this.generationId, editedOutput).subscribe({
+      next: () => {
+        this.slides = JSON.parse(JSON.stringify(this.editableSlides));
+        this.ctaSlide = this.editableCta;
+        this.isSaving.set(false);
+        this.isEditing.set(false);
+      },
+      error: (err) => {
+        this.isSaving.set(false);
+        alert('Erreur lors de la sauvegarde : ' + (err.error?.error || err.message));
+      }
+    });
+  }
+
   async exportAsPNG(): Promise<void> {
     if (!this.slideFrame) return;
     this.isExporting.set(true);
-
     try {
       const canvas = await html2canvas(this.slideFrame.nativeElement, { scale: 2 });
       const link = document.createElement('a');
@@ -82,20 +122,16 @@ export class CarouselViewer {
     if (!this.slideFrame) return;
     this.isExporting.set(true);
     const originalIndex = this.currentIndex();
-
     try {
       const pdf = new jsPDF({ unit: 'px', format: [1080, 1080] });
-
       for (let i = 0; i < this.totalSlides; i++) {
         this.currentIndex.set(i);
-        await new Promise(resolve => setTimeout(resolve, 150)); // laisser Angular re-render
+        await new Promise(resolve => setTimeout(resolve, 150));
         const canvas = await html2canvas(this.slideFrame.nativeElement, { scale: 2 });
         const imgData = canvas.toDataURL('image/png');
-
         if (i > 0) pdf.addPage([1080, 1080], 'portrait');
         pdf.addImage(imgData, 'PNG', 0, 0, 1080, 1080);
       }
-
       pdf.save(`${this.topic || 'carousel'}.pdf`);
     } finally {
       this.currentIndex.set(originalIndex);
