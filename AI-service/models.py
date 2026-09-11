@@ -20,6 +20,12 @@ class CarouselResponse(BaseModel):
     suggested_hashtags: List[str]
 
 
+class TranslatedCarouselResponse(BaseModel):
+    slides: List[Slide]
+    cta_slide: str
+    suggested_hashtags: List[str]
+
+
 class PostVariant(BaseModel):
     style: Literal["educatif", "storytelling", "question_hook"]
     text: str
@@ -28,3 +34,10 @@ class PostVariant(BaseModel):
 class PostResponse(BaseModel):
     variants: List[PostVariant]
     suggested_hashtags: List[str]
+
+
+class TranslateRequest(BaseModel):
+    slides: List[Slide]
+    cta_slide: str
+    suggested_hashtags: List[str]
+    target_language: Literal["fr", "en", "ar", "de"]   
