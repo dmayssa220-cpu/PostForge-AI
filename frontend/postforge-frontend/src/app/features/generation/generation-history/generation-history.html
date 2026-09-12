@@ -70,6 +70,8 @@
             [topic]="gen.topic"
             [generationId]="gen.id"
             [editable]="true"
+            [language]="gen.language"
+           (translated)="loadHistory()"
           ></app-carousel-viewer>
         </div>
       }

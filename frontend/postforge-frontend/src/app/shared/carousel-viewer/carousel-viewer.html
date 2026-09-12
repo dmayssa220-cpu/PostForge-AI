@@ -1,4 +1,4 @@
-<div class="carousel-viewer">
+<!--<div class="carousel-viewer">
   <div #slideFrame class="slide-frame" [style.background]="getGradient(currentIndex())">
     <button class="nav-arrow left" (click)="prev()" [disabled]="currentIndex() === 0">‹</button>
 
@@ -56,6 +56,106 @@
     </div>
   </div>
 }
+  <div class="export-actions">
+    <button class="export-btn" (click)="exportAsPNG()" [disabled]="isExporting()">
+      🖼️ Exporter cette slide (PNG)
+    </button>
+    <button class="export-btn primary" (click)="exportAllAsPDF()" [disabled]="isExporting()">
+      @if (isExporting()) {
+        <span class="spinner"></span> Export en cours...
+      } @else {
+        📄 Exporter tout (PDF)
+      }
+    </button>
+  </div>
+</div>-->
+<div class="carousel-viewer">
+  <div
+    #slideFrame
+    class="slide-frame"
+    [class.rtl]="isRtl"
+    [style.background]="getGradient(currentIndex())"
+  >
+    <button class="nav-arrow left" (click)="prev()" [disabled]="currentIndex() === 0">‹</button>
+
+    @if (!isCtaSlide && currentSlide) {
+      <div class="slide-content">
+        <span class="slide-tag">{{ currentIndex() + 1 }} / {{ totalSlides }}</span>
+        <h2>{{ currentSlide.title }}</h2>
+        <p>{{ currentSlide.content }}</p>
+      </div>
+    } @else {
+      <div class="slide-content cta-content">
+        <span class="slide-tag">{{ currentIndex() + 1 }} / {{ totalSlides }}</span>
+        <div class="cta-icon">→</div>
+        <p>{{ ctaSlide }}</p>
+        <div class="hashtags">
+          @for (tag of hashtags; track tag) {
+            <span>{{ tag }}</span>
+          }
+        </div>
+      </div>
+    }
+
+    <button class="nav-arrow right" (click)="next()" [disabled]="currentIndex() === totalSlides - 1">›</button>
+  </div>
+
+  <div class="dots">
+    @for (slide of slides; track $index; let i = $index) {
+      <button class="dot" [class.active]="i === currentIndex()" (click)="goTo(i)"></button>
+    }
+    <button class="dot" [class.active]="isCtaSlide" (click)="goTo(slides.length)"></button>
+  </div>
+
+  @if (editable && !isEditing()) {
+    <button class="export-btn" (click)="startEditing()">✏️ Éditer le contenu</button>
+  }
+
+  @if (isEditing()) {
+    <div class="edit-panel">
+      <h4>Édition des slides</h4>
+      @for (slide of editableSlides; track $index; let i = $index) {
+        <div class="edit-slide">
+          <label>Slide {{ i + 1 }} — Titre</label>
+          <input type="text" [(ngModel)]="slide.title" />
+          <label>Contenu</label>
+          <textarea [(ngModel)]="slide.content" rows="3"></textarea>
+        </div>
+      }
+      <label>Call to action</label>
+      <textarea [(ngModel)]="editableCta" rows="2"></textarea>
+
+      <div class="edit-actions">
+        <button class="export-btn" (click)="cancelEditing()">Annuler</button>
+        <button class="export-btn primary" (click)="saveEditing()" [disabled]="isSaving()">
+          {{ isSaving() ? 'Sauvegarde...' : '💾 Sauvegarder' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (generationId) {
+    <div class="translate-wrapper">
+      <button class="export-btn" (click)="toggleLanguageMenu()" [disabled]="isTranslating()">
+        @if (isTranslating()) {
+          <span class="spinner"></span> Traduction en cours...
+        } @else {
+          🌍 Traduire ce carrousel
+        }
+      </button>
+
+      @if (showLanguageMenu()) {
+        <div class="language-menu">
+          @for (lang of availableLanguages; track lang.code) {
+            @if (lang.code !== language) {
+              <button (click)="translateTo(lang.code)">{{ lang.label }}</button>
+            }
+          }
+        </div>
+      }
+    </div>
+  }
+
   <div class="export-actions">
     <button class="export-btn" (click)="exportAsPNG()" [disabled]="isExporting()">
       🖼️ Exporter cette slide (PNG)

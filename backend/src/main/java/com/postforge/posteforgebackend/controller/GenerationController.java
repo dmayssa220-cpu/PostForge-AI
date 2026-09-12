@@ -1,9 +1,6 @@
 package com.postforge.posteforgebackend.controller;
 
-import com.postforge.posteforgebackend.dto.EditGenerationRequest;
-import com.postforge.posteforgebackend.dto.GenerationRequest;
-import com.postforge.posteforgebackend.dto.GenerationResponse;
-import com.postforge.posteforgebackend.dto.ScheduleRequest;
+import com.postforge.posteforgebackend.dto.*;
 import com.postforge.posteforgebackend.service.GenerationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -80,4 +77,9 @@ public class GenerationController {
                     .toList()
     );
 }
+    @PostMapping("/{id}/translate")
+    public ResponseEntity<GenerationResponse> translate(
+            @PathVariable UUID id, @RequestBody TranslateRequest request) {
+        return ResponseEntity.ok(GenerationResponse.from(generationService.translateGeneration(id, request)));
+    }
 }

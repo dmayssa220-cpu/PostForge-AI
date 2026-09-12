@@ -35,3 +35,8 @@ export interface GenerationResponse {
 export interface ScheduleRequest {
   scheduledDate: string;
 }
+export type TargetLanguage = 'fr' | 'en' | 'ar' | 'de';
+
+export interface TranslateRequest {
+  targetLanguage: TargetLanguage;
+}

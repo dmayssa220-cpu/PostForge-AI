@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { GenerationRequest, GenerationResponse, ScheduleRequest } from '../models/generation.model';
+import { GenerationRequest, GenerationResponse, ScheduleRequest, TranslateRequest } from '../models/generation.model';
 
 @Injectable({ providedIn: 'root' })
 export class GenerationService {
@@ -44,4 +44,7 @@ export class GenerationService {
     if (status) params.status = status;
     return this.http.get<GenerationResponse[]>(`${this.baseUrl}/search`, { params });
   }
+  translate(id: string, request: TranslateRequest): Observable<GenerationResponse> {
+  return this.http.post<GenerationResponse>(`${this.baseUrl}/${id}/translate`, request);
+}
 }
