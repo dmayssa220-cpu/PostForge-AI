@@ -138,3 +138,44 @@
     margin-bottom: 1.5rem;
   }
 }
+.input-with-mic {
+  display: flex;
+  gap: 0.5rem;
+
+  input {
+    flex: 1;
+  }
+}
+
+.mic-btn {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: var(--primary);
+  }
+
+  &.listening {
+    background: #fef2f2;
+    border-color: #dc2626;
+    animation: pulse 1.2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+}
+
+.listening-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0.4rem 0 0;
+  font-style: italic;
+}

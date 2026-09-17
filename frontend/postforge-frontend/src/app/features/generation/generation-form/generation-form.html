@@ -4,22 +4,45 @@
       <h1>Générer un carrousel</h1>
       <p class="subtitle">Transforme un sujet technique en carrousel LinkedIn prêt à publier</p>
     </div>
-    <button class="link-button" (click)="goToHistory()">📜 Historique</button>
+    <button type="button" class="link-button" (click)="goToHistory()">📜 Historique</button>
   </header>
 
   <div class="form-card">
     <form (ngSubmit)="onSubmit()" #genForm="ngForm">
       <div class="form-group">
-        <label for="topic">Sujet</label>
-        <input
-          type="text"
-          id="topic"
-          name="topic"
-          [(ngModel)]="topic"
-          required
-          placeholder="Ex: Le pattern Singleton"
-        />
-      </div>
+  <label for="topic">Sujet</label>
+  <div class="input-with-mic">
+    <input
+      type="text"
+      id="topic"
+      name="topic"
+      [(ngModel)]="topic"
+      required
+      placeholder="Ex: Le pattern Singleton"
+    />
+    @if (recorder.isSupported()) {
+      <button
+        type="button"
+        class="mic-btn"
+        [class.listening]="recorder.isRecording()"
+        [disabled]="isTranscribing()"
+        (click)="toggleRecording()"
+      >
+        {{ recorder.isRecording() ? '⏹️' : '🎙️' }}
+      </button>
+    }
+  </div>
+
+  @if (recorder.isRecording()) {
+    <p class="listening-hint">🔴 Enregistrement en cours... clique sur ⏹️ pour arrêter</p>
+  }
+  @if (isTranscribing()) {
+    <p class="listening-hint">⏳ Transcription en cours...</p>
+  }
+  @if (recorder.errorMessage()) {
+    <p class="error">{{ recorder.errorMessage() }}</p>
+  }
+</div>
 
       <div class="form-row">
         <div class="form-group">

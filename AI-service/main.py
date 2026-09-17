@@ -1,15 +1,30 @@
 import json
 import os
+import time
 
 from google import genai
+from google.genai import errors
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import ValidationError
 from models import GenerationRequest, CarouselResponse, TranslateRequest, TranslatedCarouselResponse
-
+from fastapi import UploadFile, File, Form
+from google.genai import types
 
 app = FastAPI(title="PostForge AI - Microservice IA")
 
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+load_dotenv()
+gemini_api_key = os.environ.get("GEMINI_API_KEY")
+client = genai.Client(api_key=gemini_api_key) if gemini_api_key else None
+
+
+def get_gemini_client():
+    if client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="GEMINI_API_KEY est manquante. Ajoutez-la dans le fichier .env puis redémarrez le service.",
+        )
+    return client
 
 CAROUSEL_SYSTEM_PROMPT = """Tu es un générateur de contenu structuré pour LinkedIn.
 Tu dois répondre UNIQUEMENT avec un JSON valide, sans aucun texte avant ou après,
@@ -36,18 +51,19 @@ Contraintes :
 
 @app.post("/internal/v1/generate/carousel", response_model=CarouselResponse)
 def generate_carousel(request: GenerationRequest):
+    gemini_client = get_gemini_client()
     prompt = CAROUSEL_SYSTEM_PROMPT.format(
         tone=request.tone, language=request.language, topic=request.topic
     )
 
-    response = client.models.generate_content(
+    response = gemini_client.models.generate_content(
     model="gemini-3.6-flash",
     contents=prompt,
 )
 
     raw_text = response.text.strip()
 
-    # Gemini peut parfois entourer le JSON de ```json ... ``` malgré la consigne
+   
     if raw_text.startswith("```"):
         raw_text = raw_text.strip("`")
         if raw_text.startswith("json"):
@@ -100,6 +116,7 @@ Contenu original à traduire :
 
 @app.post("/internal/v1/translate/carousel", response_model=TranslatedCarouselResponse)
 def translate_carousel(request: TranslateRequest):
+    gemini_client = get_gemini_client()
     target_language_name = LANGUAGE_NAMES.get(request.target_language, request.target_language)
 
     original_content = json.dumps({
@@ -113,7 +130,7 @@ def translate_carousel(request: TranslateRequest):
         original_content=original_content,
     )
 
-    response = client.models.generate_content(
+    response = gemini_client.models.generate_content(
         model="gemini-3.6-flash",
         contents=prompt,
     )
@@ -133,3 +150,38 @@ def translate_carousel(request: TranslateRequest):
             status_code=502,
             detail=f"La traduction a retourné une sortie invalide: {str(e)}",
         )
+    
+@app.post("/internal/v1/transcribe/audio")
+async def transcribe_audio(file: UploadFile = File(...), language: str = Form("fr")):
+    gemini_client = get_gemini_client()
+    audio_bytes = await file.read()
+    mime_type = file.content_type or "audio/webm"
+
+    prompt = (
+        f"Transcris fidèlement cet enregistrement audio en texte, dans la langue parlée "
+        f"(probablement {language}). Réponds UNIQUEMENT avec le texte transcrit brut, "
+        f"sans commentaire, sans guillemets, sans ponctuation de balisage."
+    )
+
+    try:
+        for attempt in range(3):
+            try:
+                response = gemini_client.models.generate_content(
+                    model="gemini-3.6-flash",
+                    contents=[
+                        types.Part.from_bytes(data=audio_bytes, mime_type=mime_type),
+                        prompt,
+                    ],
+                )
+                break
+            except errors.ServerError as error:
+                if error.code != 503 or attempt == 2:
+                    raise
+                time.sleep(1 + attempt)
+    except errors.ServerError as error:
+        raise HTTPException(
+            status_code=503,
+            detail="Le modèle Gemini est temporairement indisponible. Réessayez dans quelques instants.",
+        ) from error
+
+    return {"transcript": response.text.strip()}    

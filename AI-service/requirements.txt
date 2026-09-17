@@ -3,3 +3,4 @@ uvicorn[standard]==0.32.0
 google-genai==0.3.0
 pydantic==2.9.2
 python-dotenv==1.0.1
+python-multipart==0.0.9
